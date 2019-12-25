@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"github.com/damienleroux/test-go-exact-algo-travelling-salesman-problem/internal/mathUtils"
 )
 
 func duplicateWithoutOneSale(sales []Sale, index int) []Sale {
@@ -10,14 +9,14 @@ func duplicateWithoutOneSale(sales []Sale, index int) []Sale {
 	duplicatedSales := make([]Sale, salesLen)
 	copy(duplicatedSales, sales)
 	duplicatedSales[index] = duplicatedSales[salesLen-1] //replace sale to delete with the last sale
-	return duplicatedSales[:salesLen-1]                   //return a duplicated array without the last element
+	return duplicatedSales[:salesLen-1]                  //return a duplicated array without the last element
 }
 
 func createStep(lastStep Step, sale Sale) Step {
 	distanceFromLastStep := 0.0
 	totalCoveredDistance := 0.0
 	if lastStep.Sale != nil {
-		distanceFromLastStep = rawDistance(lastStep.Sale.Lat, lastStep.Sale.Long, sale.Lat, sale.Long)
+		distanceFromLastStep = mathUtils.RawDistance(lastStep.Sale.Lat, lastStep.Sale.Long, sale.Lat, sale.Long)
 		totalCoveredDistance = lastStep.TotalCoveredDistance + distanceFromLastStep
 	}
 
@@ -27,7 +26,7 @@ func createStep(lastStep Step, sale Sale) Step {
 
 func createRoutes(sales []Sale, lastStep Step) []Step {
 	// create the number of possible solutions considering the total numerb of sales
-	steps := make([]Step, factorial(len(sales)))
+	steps := make([]Step, mathUtils.Factorial(len(sales)))
 
 	stepIndex := 0
 	for index, sale := range sales {
@@ -54,10 +53,7 @@ func createRoutes(sales []Sale, lastStep Step) []Step {
 
 func getBestRoute(sales []Sale) Route {
 	// Create routes
-	start := time.Now()
 	routes := createRoutes(sales, Step{})
-	elapsed := time.Since(start)
-	fmt.Printf("time to compute all routes for %d sales and %d routes is %s\n", len(sales), len(routes), elapsed)
 
 	bestStep := routes[0]
 

@@ -1,13 +1,13 @@
 package main
 
 type Sale struct {
-	Name string  `json:"name"`
-	Lat  float64 `json:"lat"`
-	Long float64 `json:"long"`
+	Name string
+	Lat  float64
+	Long float64
 }
 
 type Step struct {
-	Sale                 *Sale
+	Sale                  *Sale
 	PreviousStep          *Step
 	DistanceFromLastPoint float64
 	TotalCoveredDistance  float64
