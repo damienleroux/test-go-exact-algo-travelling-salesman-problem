@@ -24,45 +24,58 @@ func createStep(lastStep Step, sale Sale) Step {
 	return step
 }
 
-func createRoutes(sales []Sale, lastStep Step) []Step {
-	// create the number of possible solutions considering the total numerb of sales
-	steps := make([]Step, mathUtils.Factorial(len(sales)))
+// convert types take an int and return a string value.
+type callbackEnd func()
 
-	stepIndex := 0
-	for index, sale := range sales {
+//provide to channel every possible values
+func createRoutes(routesChan chan<- Step, sales []Sale, lastStep Step, safeGuard chan int, maxGoroutines int, onEnd callbackEnd) {
+	if len(sales) == 1 {
+		routesChan <- createStep(lastStep, sales[0])
+	} else {
+		for index, sale := range sales {
 
-		// transform the sale as a step
-		step := createStep(lastStep, sale)
+			// transform the sale as a step
+			step := createStep(lastStep, sale)
 
-		// remove the sale from the current list of sales
-		remainingSales := duplicateWithoutOneSale(sales, index)
+			// remove the sale from the current list of sales
+			remainingSales := duplicateWithoutOneSale(sales, index)
 
-		if len(remainingSales) > 0 {
-			for _, step := range createRoutes(remainingSales, step) {
-				steps[stepIndex] = step
-				stepIndex++
+			if len(safeGuard) < maxGoroutines {
+				safeGuard <- 1
+				releaseSafeGuard := func() { <-safeGuard }
+				go createRoutes(routesChan, remainingSales, step, safeGuard, maxGoroutines, releaseSafeGuard)
+			} else {
+				createRoutes(routesChan, remainingSales, step, safeGuard, maxGoroutines, nil)
 			}
-		} else {
-			// no more remaining sales, only one solution possible
-			steps[stepIndex] = step
-			stepIndex++
 		}
 	}
-	return steps
+
+	if onEnd != nil {
+		onEnd()
+	}
 }
 
-func getBestRoute(sales []Sale) Route {
-	// Create routes
-	routes := createRoutes(sales, Step{})
+// Compute the best route to link a number of sales, each sale being represented by geo coordinates.
+func GetBestRoute(sales []Sale, maxGoroutines int) Route {
 
-	bestStep := routes[0]
+	safeGuard := make(chan int, maxGoroutines)
+	routesChan := make(chan Step)
+
+	// Create routes
+	go createRoutes(routesChan, sales, Step{}, safeGuard, maxGoroutines, nil)
 
 	// Find best route
+	bestStep := Step{nil, nil, 0, 0}
+	numberOfSolutions := mathUtils.Factorial(len(sales))
+	stepIndex := 0
+	for step := range routesChan {
 
-	for i := 1; i < len(routes); i++ {
-		step := routes[i]
-		if step.TotalCoveredDistance < bestStep.TotalCoveredDistance {
+		if bestStep.Sale == nil || step.TotalCoveredDistance < bestStep.TotalCoveredDistance {
 			bestStep = step
+		}
+		stepIndex++
+		if stepIndex == numberOfSolutions {
+			close(routesChan)
 		}
 	}
 

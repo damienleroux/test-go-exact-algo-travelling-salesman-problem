@@ -18,7 +18,8 @@ func getSales(numberOfSales int) []Sale {
 	saleH := Sale{"H", 48.87433373850616, 2.3230991729663097}
 	saleI := Sale{"I", 48.87409381719493, 2.3328624137805187}
 	saleJ := Sale{"J", 48.87413615633347, 2.327691114799806}
-	availableSales := []Sale{saleA, saleB, saleC, saleD, saleE, saleF, saleG, saleH, saleI, saleJ}
+	saleK := Sale{"K", 48.87413615634347, 2.327691114798806}
+	availableSales := []Sale{saleA, saleB, saleC, saleD, saleE, saleF, saleG, saleH, saleI, saleJ, saleK}
 
 	sales := make([]Sale, numberOfSales)
 	for i := 0; i < numberOfSales; i++ {
@@ -29,7 +30,7 @@ func getSales(numberOfSales int) []Sale {
 
 func TestGetBestRoute10(t *testing.T) {
 	sales := getSales(10)
-	route := getBestRoute(sales)
+	route := GetBestRoute(sales, 100)
 
 	expectedSalesOrder := []Sale{sales[2], sales[9], sales[0], sales[1], sales[8], sales[4], sales[3], sales[5], sales[7], sales[6]}
 
@@ -39,17 +40,29 @@ func TestGetBestRoute10(t *testing.T) {
 
 }
 
-func benchmarkGetBestRoute(numberOfSales int, b *testing.B) {
+func benchmarkGetBestRoute(numberOfSales int, b *testing.B, multithread bool) {
 	sales := getSales(numberOfSales)
 
+	maxGoroutines := 100
+	if !multithread {
+		maxGoroutines = 0
+	}
 	for n := 0; n < b.N; n++ {
-		getBestRoute(sales)
+		GetBestRoute(sales, maxGoroutines)
 	}
 }
 
-func BenchmarkGetBestRoute5(b *testing.B)  { benchmarkGetBestRoute(5, b) }
-func BenchmarkGetBestRoute6(b *testing.B)  { benchmarkGetBestRoute(6, b) }
-func BenchmarkGetBestRoute7(b *testing.B)  { benchmarkGetBestRoute(7, b) }
-func BenchmarkGetBestRoute8(b *testing.B)  { benchmarkGetBestRoute(8, b) }
-func BenchmarkGetBestRoute9(b *testing.B)  { benchmarkGetBestRoute(9, b) }
-func BenchmarkGetBestRoute10(b *testing.B) { benchmarkGetBestRoute(10, b) }
+func BenchmarkGetBestRoute5(b *testing.B)             { benchmarkGetBestRoute(5, b, false) }
+func BenchmarkGetBestRoute6(b *testing.B)             { benchmarkGetBestRoute(6, b, false) }
+func BenchmarkGetBestRoute7(b *testing.B)             { benchmarkGetBestRoute(7, b, false) }
+func BenchmarkGetBestRoute8(b *testing.B)             { benchmarkGetBestRoute(8, b, false) }
+func BenchmarkGetBestRoute9(b *testing.B)             { benchmarkGetBestRoute(9, b, false) }
+func BenchmarkGetBestRoute10(b *testing.B)            { benchmarkGetBestRoute(10, b, false) }
+func BenchmarkGetBestRoute11(b *testing.B)            { benchmarkGetBestRoute(11, b, false) }
+func BenchmarkGetBestRouteMultithread5(b *testing.B)  { benchmarkGetBestRoute(5, b, true) }
+func BenchmarkGetBestRoutMultithreade6(b *testing.B)  { benchmarkGetBestRoute(6, b, true) }
+func BenchmarkGetBestRouteMultithread7(b *testing.B)  { benchmarkGetBestRoute(7, b, true) }
+func BenchmarkGetBestRouteMultithread8(b *testing.B)  { benchmarkGetBestRoute(8, b, true) }
+func BenchmarkGetBestRouteMultithread9(b *testing.B)  { benchmarkGetBestRoute(9, b, true) }
+func BenchmarkGetBestRouteMultithread10(b *testing.B) { benchmarkGetBestRoute(10, b, true) }
+func BenchmarkGetBestRouteMultithread11(b *testing.B) { benchmarkGetBestRoute(11, b, true) }

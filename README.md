@@ -6,7 +6,9 @@ Just for fun to play with go and to benchmark performance using exact algorithm 
 
 ## How this algo works?
 
-1) Computes every possible tours using a list of sales. Computation is not channeled yet.
+All begins with the function `GetBestRoute(sales , maxGoroutines)` with `sales` a list of geolocalised sales to deliver and `maxGoroutines` the number of possible parralel computation (used by the algorithm and depening on your CPU core number)
+
+1) Computes every possible tours using a list of sales. Computation may or not use multiple thread (go routine): this option is a parameter when calling `GetBestRoute`
 
 During this step, the distance from one sale to the next one is based on computing the "fly-bird distance" between two coordinates (See `RawDistance` func).
 
@@ -18,19 +20,38 @@ During this step, the distance from one sale to the next one is based on computi
 
 launch `go test -bench="." -run="^a"`
 
-Last running benchmarks on my personal computer:
+Last running benchmarks on my personal computer for `X` number of sales (`BenchmarkGetBestRouteX`):
 
-```bash
+```config
 goos: windows
 goarch: amd64
-pkg: github.com/damienleroux/test-go-exact-algo-travelling-salesman-problem
-BenchmarkGetBestRoute5-8            9765            115362 ns/op
-BenchmarkGetBestRoute6-8            1411            820696 ns/op
-BenchmarkGetBestRoute7-8             219           5143919 ns/op
-BenchmarkGetBestRoute8-8              25          46540916 ns/op
-BenchmarkGetBestRoute9-8               2         509702800 ns/op
-BenchmarkGetBestRoute10-8              1        5450451300 ns/op
+CPU Intel Core i7-4790K (4.0 GHz) <= 4 Cores
 ```
+
+Below the benchmark launched without go routines (only one thread). 30% of my cpu used over 90% available
+
+```bash
+BenchmarkGetBestRoute5                   7922             159934 ns/op
+BenchmarkGetBestRoute6                   1198             985810 ns/op
+BenchmarkGetBestRoute7                    182            6719754 ns/op
+BenchmarkGetBestRoute8                     21           57523724 ns/op
+BenchmarkGetBestRoute9                      2          540000000 ns/op  540ms
+BenchmarkGetBestRoute10                     1         6446002000 ns/op     6s
+BenchmarkGetBestRoute11                     1        59872999000 ns/op    59s
+```
+
+Below the benchmark launched with go routines (up to 100 threads). 90% of my cpu used for that over 90% available.
+
+```bash
+BenchmarkGetBestRouteMultithread5       12206              93888 ns/op
+BenchmarkGetBestRoutMultithreade6        2998             407605 ns/op
+BenchmarkGetBestRouteMultithread7         481            2482329 ns/op
+BenchmarkGetBestRouteMultithread8          58           18724136 ns/op
+BenchmarkGetBestRouteMultithread9           6          175166767 ns/op  175ms
+BenchmarkGetBestRouteMultithread10          1         1647998600 ns/op   1,6s
+BenchmarkGetBestRouteMultithread11          1        19823001300 ns/op    19s
+```
+
 
 ## Run  tests
 
