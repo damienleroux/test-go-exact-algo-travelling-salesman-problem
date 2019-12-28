@@ -16,3 +16,6 @@ type Step struct {
 type Route struct {
 	Steps []Step
 }
+
+// convert types take an int and return a string value.
+type CallbackEnd func()

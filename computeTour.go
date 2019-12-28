@@ -24,11 +24,8 @@ func createStep(lastStep Step, sale Sale) Step {
 	return step
 }
 
-// convert types take an int and return a string value.
-type callbackEnd func()
-
 //provide to channel every possible values
-func createRoutes(routesChan chan<- Step, sales []Sale, lastStep Step, safeGuard chan int, maxGoroutines int, onEnd callbackEnd) {
+func createRoutes(routesChan chan<- Step, sales []Sale, lastStep Step, safeGuard chan int, maxGoroutines int, onEnd CallbackEnd) {
 	if len(sales) == 1 {
 		routesChan <- createStep(lastStep, sales[0])
 	} else {
