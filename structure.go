@@ -1,4 +1,4 @@
-package main
+package computeTour
 
 type Sale struct {
 	Name string
