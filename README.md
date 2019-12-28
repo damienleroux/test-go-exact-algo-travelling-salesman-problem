@@ -1,4 +1,4 @@
-# test exact algorithm performance with go
+# Resolving the Travelling salesman problem using exact algorithme & go
 
 ## Motivation
 
