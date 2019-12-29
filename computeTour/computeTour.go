@@ -1,7 +1,7 @@
 package computeTour
 
 import (
-	"github.com/damienleroux/test-go-exact-algo-travelling-salesman-problem/internal/mathUtils"
+	"github.com/damienleroux/test-go-exact-algo-travelling-salesman-problem/computeTour/internal/mathUtils"
 )
 
 func duplicateWithoutOneSale(sales []Sale, index int) []Sale {
