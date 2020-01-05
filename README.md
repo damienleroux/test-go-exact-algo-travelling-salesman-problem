@@ -18,7 +18,7 @@ During this step, the distance from one sale to the next one is based on computi
 
 ## Run benchmark
 
-launch `go test -bench="." -run="^a"`
+launch `go test -bench="." -run="^a" -v ./...`
 
 Last running benchmarks on my personal computer for `X` number of sales (`BenchmarkGetBestRouteX`):
 
